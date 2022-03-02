@@ -2,6 +2,9 @@ import PySimpleGUI as sg
 import requests
 from bs4 import BeautifulSoup
 
+global willContinue
+willContinue = True
+
 
 def inputGUI():
     layout = [
@@ -30,6 +33,8 @@ def inputGUI():
                 health(values)
             break
         if event == "Cancel" or event == sg.WIN_CLOSED:
+            global willContinue
+            willContinue = False
             break
         window.close()
 
@@ -49,6 +54,8 @@ def outputGUI(elements):
         if event == 'Continue Search':
             break
         if event == 'Close' or event == sg.WIN_CLOSED:
+            global willContinue
+            willContinue = False
             break
     window.close()
 
@@ -112,4 +119,5 @@ def health(values):
 
 
 sg.theme('SandyBeach')
-inputGUI()
+while willContinue:
+    inputGUI()
