@@ -6,7 +6,7 @@ global willContinue
 willContinue = True
 
 
-def inputGUI():
+def input_GUI():
     layout = [
         [sg.Text('Choose Website')],
         [sg.Combo(['https://realpython.github.io/fake-jobs/', 'https://www.ms3-inc.com/careers/',
@@ -19,9 +19,6 @@ def inputGUI():
     while True:
         event, values = window.read()
         if event == "Submit":
-            URL = values[0]
-            Job_Title = values[1]
-            Location = values[2]
             if values[0] == 'https://realpython.github.io/fake-jobs/':
                 window.close()
                 tutorial(values)
@@ -39,10 +36,10 @@ def inputGUI():
         window.close()
 
 
-def outputGUI(elements):
+def output_GUI(elements):
     layout = [
         [sg.Text('Job Results')],
-        [sg.Output(key='Output', size=(100,30))],
+        [sg.Output(key='Output', size=(100, 30))],
         [sg.Button('Continue Search'), sg.Button('Close')]
     ]
     window = sg.Window('Results', layout, element_justification='center').finalize()
@@ -73,12 +70,12 @@ def tutorial(values):
         location_element = job_element.find("p", class_="location")
         link_element = job_element.find_all("a")
         if values[1] == title_element.text.strip() or values[2] == location_element.text.strip():
-            elements.append(title_element.text.strip())
-            elements.append(company_element.text.strip())
-            elements.append(location_element.text.strip())
+            elements.append("Job Title: " + title_element.text.strip())
+            elements.append("Company Name: " + company_element.text.strip())
+            elements.append("Location: " + location_element.text.strip())
             link_url = link_element[1]["href"]
             elements.append(f"Apply Here: {link_url}\n")
-    outputGUI(elements)
+    output_GUI(elements)
 
 
 def ms3(values):
@@ -92,32 +89,32 @@ def ms3(values):
         title_element = job_element.find("div", class_="skill-title")
         link_element = job_element.find("a")
         if values[1] == title_element.text.strip():
-            elements.append(title_element.text.strip())
+            elements.append("Job Title: " + title_element.text.strip())
             link_url = link_element["href"]
             elements.append(f"Apply Here: {link_url}\n")
-    outputGUI(elements)
+    output_GUI(elements)
 
 
 def health(values):
     url = "http://health.wvu.edu/healthaffairs/careers/"
     page = requests.get(url)
-    counter = 0
     soup = BeautifulSoup(page.content, "html.parser")
     elements = []
     results = soup.find(id="content")
     target = results.find(class_="page-primary rich-text")
     for child in target.children:
         if child.name == "h4":
-            elements.append(child.text.strip())
-            while True:
-                child = child.nextSibling
-                if child.name == "h4" or child.name == "h3":
-                    break
-                elif child.name == "p":
-                    elements.append(child.text.strip())
-    outputGUI(elements)
+            if values[1] == child.text.strip():
+                elements.append("Job Title: " + child.text.strip())
+                while True:
+                    child = child.nextSibling
+                    if child.name == "h4" or child.name == "h3":
+                        break
+                    elif child.name == "p":
+                        elements.append(child.text.strip())
+    output_GUI(elements)
 
 
 sg.theme('SandyBeach')
 while willContinue:
-    inputGUI()
+    input_GUI()
