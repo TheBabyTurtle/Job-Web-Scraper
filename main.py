@@ -50,8 +50,8 @@ def tutorial(values):
         company_element = job_element.find("h3", class_="company")
         location_element = job_element.find("p", class_="location")
         link_element = job_element.find_all("a")
-        if values[1] == title_element.text.strip() or values[2] == location_element.text.strip() or \
-                values[1] == "" and values[2] == "":
+        if (values[1] == title_element.text.strip() or values[1] == "") and \
+                (values[2] == location_element.text.strip() or values[2] == ""):
             elements.append("Job Title: " + title_element.text.strip())
             elements.append("Company Name: " + company_element.text.strip())
             elements.append("Location: " + location_element.text.strip())
