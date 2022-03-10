@@ -5,14 +5,14 @@ from bs4 import BeautifulSoup
 
 def inputGUI():
     layout = [
-        [sg.Text('Job Results')],
-        [sg.Output(key='Output', size=(100, 30))],
         [sg.Text('Choose Website')],
         [sg.Combo(['https://realpython.github.io/fake-jobs/', 'https://www.ms3-inc.com/careers/',
                    'http://health.wvu.edu/healthaffairs/careers/'])],
         [sg.Text('Job Title', size=(8, 1)), sg.InputText()],
         [sg.Text('Location', size=(8, 1)), sg.InputText()],
-        [sg.Button("Submit"), sg.Button("Cancel"), sg.Button("Clear")]
+        [sg.Button("Submit"), sg.Button("Cancel"), sg.Button("Clear Results")],
+        [sg.Text('Job Results')],
+        [sg.Output(key='Output', size=(100, 20))]
     ]
     window = sg.Window('Web Scraper', layout).finalize()
     window['Output'].TKOut.output.config(wrap='word')
@@ -34,7 +34,7 @@ def inputGUI():
         if event == "Cancel" or event == sg.WIN_CLOSED:
             window.close()
             break
-        if event == "Clear":
+        if event == "Clear Results":
             window.FindElement('Output').Update('')
 
 
@@ -50,8 +50,9 @@ def tutorial(values):
         company_element = job_element.find("h3", class_="company")
         location_element = job_element.find("p", class_="location")
         link_element = job_element.find_all("a")
-        if values[1] == title_element.text.strip() or values[2] == location_element.text.strip() or values[1] == "" or values[2] == "":
-            elements.append("Job Title:" + title_element.text.strip())
+        if values[1] == title_element.text.strip() or values[2] == location_element.text.strip() or \
+                values[1] == "" and values[2] == "":
+            elements.append("Job Title: " + title_element.text.strip())
             elements.append("Company Name: " + company_element.text.strip())
             elements.append("Location: " + location_element.text.strip())
             link_url = link_element[1]["href"]
@@ -76,7 +77,7 @@ def ms3(values):
         description = element_results.find("div", class_="career-highlight")
         if values[1] == title_element.text.strip() or values[1] == "":
             elements.append("Job Title: " + title_element.text.strip())
-            elements.append("Position Summary: " + description.text.strip())
+            elements.append("Position Summary: \n" + description.text.strip())
             elements.append(f"Apply Here: {link_url}\n")
     return elements
 
