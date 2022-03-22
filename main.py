@@ -119,9 +119,13 @@ def career_builders(values):
         job_description = job_element.findAll("div", class_="block")
         job_link = job_element.find("a")
         elements.append("\n" + "Job Title: " + title_element.text.strip())
-        elements.append("Company Name: " + job_details[0].text.strip())
-        elements.append("Location: " + job_details[1].text.strip())
-        elements.append("Part/Full-time: " + job_details[2].text.strip())
+        if len(job_details) == 3:
+            elements.append("Company Name: " + job_details[0].text.strip())
+            elements.append("Location: " + job_details[1].text.strip())
+            elements.append("Part/Full-time: " + job_details[2].text.strip())
+        elif len(job_details) == 2:
+            elements.append("Location: " + job_details[0].text.strip())
+            elements.append("Part/Full-time: " + job_details[1].text.strip())
         elements.append("Description: " + job_description[0].text.strip())
         if job_description[1].text.strip() != "":
             elements.append("Salary/Pay: " + job_description[1].text.strip())
