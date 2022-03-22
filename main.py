@@ -5,36 +5,39 @@ from bs4 import BeautifulSoup
 
 def inputGUI():
     layout = [
+        [sg.Text('Job Results')],
+        [sg.Output(key='Output', size=(100, 30))],
         [sg.Text('Choose Website')],
-        [sg.Combo(['https://realpython.github.io/fake-jobs/', 'https://www.ms3-inc.com/careers/',
-                   'http://health.wvu.edu/healthaffairs/careers/'])],
+        [sg.Combo(['Fake Jobs', 'MS3', 'WVU Office of Health Affairs', 'Career Builder'])],
         [sg.Text('Job Title', size=(8, 1)), sg.InputText()],
         [sg.Text('Location', size=(8, 1)), sg.InputText()],
-        [sg.Button("Submit"), sg.Button("Cancel"), sg.Button("Clear Results")],
-        [sg.Text('Job Results')],
-        [sg.Output(key='Output', size=(100, 20))]
+        [sg.Button("Submit"), sg.Button("Cancel"), sg.Button("Clear")]
     ]
     window = sg.Window('Web Scraper', layout).finalize()
     window['Output'].TKOut.output.config(wrap='word')
     while True:
         event, values = window.read()
         if event == "Submit":
-            if values[0] == 'https://realpython.github.io/fake-jobs/':
+            if values[0] == 'Fake Jobs':
                 print("Beautiful Soup Tutorial Results")
                 for value in tutorial(values):
                     print(value)
-            if values[0] == 'https://www.ms3-inc.com/careers/':
+            if values[0] == 'MS3':
                 print("MS3 Results")
                 for value in ms3(values):
                     print(value)
-            if values[0] == 'http://health.wvu.edu/healthaffairs/careers/':
+            if values[0] == 'WVU Office of Health Affairs':
                 print("WVU Office of Health Affairs Results")
                 for value in health(values):
+                    print(value)
+            if values[0] == 'Career Builder':
+                print("Career Builder Results")
+                for value in career_builders(values):
                     print(value)
         if event == "Cancel" or event == sg.WIN_CLOSED:
             window.close()
             break
-        if event == "Clear Results":
+        if event == "Clear":
             window.FindElement('Output').Update('')
 
 
@@ -52,7 +55,7 @@ def tutorial(values):
         link_element = job_element.find_all("a")
         if (values[1] == title_element.text.strip() or values[1] == "") and \
                 (values[2] == location_element.text.strip() or values[2] == ""):
-            elements.append("Job Title: " + title_element.text.strip())
+            elements.append("Job Title:" + title_element.text.strip())
             elements.append("Company Name: " + company_element.text.strip())
             elements.append("Location: " + location_element.text.strip())
             link_url = link_element[1]["href"]
@@ -77,7 +80,7 @@ def ms3(values):
         description = element_results.find("div", class_="career-highlight")
         if values[1] == title_element.text.strip() or values[1] == "":
             elements.append("Job Title: " + title_element.text.strip())
-            elements.append("Position Summary: \n" + description.text.strip())
+            elements.append("Position Summary: " + description.text.strip())
             elements.append(f"Apply Here: {link_url}\n")
     return elements
 
@@ -99,6 +102,32 @@ def health(values):
                         break
                     elif child.name == "p":
                         elements.append(child.text.strip())
+    return elements
+
+
+def career_builders(values):
+    url = "https://www.careerbuilder.com/jobs?emp=" + "&keywords=" + values[1] + "&location=" + values[2]
+    elements = []
+    page = requests.get(url)
+    soup = BeautifulSoup(page.content, "html.parser")
+    results = soup.find(id="site-content")
+    job_elements = results.find_all("li", class_="data-results-content-parent relative")
+    for job_element in job_elements:
+        title_element = job_element.find("div", class_="data-results-title dark-blue-text b")
+        job_details = job_element.find("div", class_="data-details")
+        job_details = job_details.findAll("span")
+        job_description = job_element.findAll("div", class_="block")
+        job_link = job_element.find("a")
+        elements.append("\n" + "Job Title: " + title_element.text.strip())
+        elements.append("Company Name: " + job_details[0].text.strip())
+        elements.append("Location: " + job_details[1].text.strip())
+        elements.append("Part/Full-time: " + job_details[2].text.strip())
+        elements.append("Description: " + job_description[0].text.strip())
+        if job_description[1].text.strip() != "":
+            elements.append("Salary/Pay: " + job_description[1].text.strip())
+        else:
+            elements.append("No salary/pay given.")
+        elements.append("Apply Here: https://www.careerbuilder.com/" + job_link["href"])
     return elements
 
 
