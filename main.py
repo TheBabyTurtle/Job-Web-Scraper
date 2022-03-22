@@ -5,13 +5,13 @@ from bs4 import BeautifulSoup
 
 def inputGUI():
     layout = [
-        [sg.Text('Job Results')],
-        [sg.Output(key='Output', size=(100, 30))],
         [sg.Text('Choose Website')],
         [sg.Combo(['Fake Jobs', 'MS3', 'WVU Office of Health Affairs', 'Career Builder'])],
         [sg.Text('Job Title', size=(8, 1)), sg.InputText()],
         [sg.Text('Location', size=(8, 1)), sg.InputText()],
-        [sg.Button("Submit"), sg.Button("Cancel"), sg.Button("Clear")]
+        [sg.Button("Submit"), sg.Button("Cancel"), sg.Button("Clear Results")],
+        [sg.Text('Job Results')],
+        [sg.Output(key='Output', size=(100, 20))]
     ]
     window = sg.Window('Web Scraper', layout).finalize()
     window['Output'].TKOut.output.config(wrap='word')
@@ -37,7 +37,7 @@ def inputGUI():
         if event == "Cancel" or event == sg.WIN_CLOSED:
             window.close()
             break
-        if event == "Clear":
+        if event == "Clear Results":
             window.FindElement('Output').Update('')
 
 
@@ -80,7 +80,7 @@ def ms3(values):
         description = element_results.find("div", class_="career-highlight")
         if values[1] == title_element.text.strip() or values[1] == "":
             elements.append("Job Title: " + title_element.text.strip())
-            elements.append("Position Summary: " + description.text.strip())
+            elements.append("Position Summary: \n" + description.text.strip())
             elements.append(f"Apply Here: {link_url}\n")
     return elements
 
@@ -126,12 +126,12 @@ def career_builders(values):
         elif len(job_details) == 2:
             elements.append("Location: " + job_details[0].text.strip())
             elements.append("Part/Full-time: " + job_details[1].text.strip())
-        elements.append("Description: " + job_description[0].text.strip())
+            elements.append("Description: " + job_description[0].text.strip())
         if job_description[1].text.strip() != "":
             elements.append("Salary/Pay: " + job_description[1].text.strip())
         else:
             elements.append("No salary/pay given.")
-        elements.append("Apply Here: https://www.careerbuilder.com/" + job_link["href"])
+            elements.append("Apply Here: https://www.careerbuilder.com/" + job_link["href"])
     return elements
 
 
