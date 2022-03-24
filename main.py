@@ -197,7 +197,7 @@ def irs(values):
             elements.append("Grade and Pay Range: " + grade_element.text.strip())
             elements.append("Locations: " + location_element.text.strip())
             elements.append("Apply here: " + link_element["href"] + "\n")
-        return elements
+    return elements
 
 
 sg.theme('SandyBeach')
