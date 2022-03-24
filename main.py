@@ -134,12 +134,12 @@ def career_builders(values):
         elif len(job_details) == 2:
             elements.append("Location: " + job_details[0].text.strip())
             elements.append("Part/Full-time: " + job_details[1].text.strip())
-            elements.append("Description: " + job_description[0].text.strip())
+        elements.append("Description: " + job_description[0].text.strip())
         if job_description[1].text.strip() != "":
             elements.append("Salary/Pay: " + job_description[1].text.strip())
         else:
             elements.append("No salary/pay given.")
-            elements.append("Apply Here: https://www.careerbuilder.com/" + job_link["href"])
+        elements.append("Apply Here: https://www.careerbuilder.com/" + job_link["href"])
     return elements
 
 
