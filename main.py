@@ -6,7 +6,7 @@ from bs4 import BeautifulSoup
 def inputGUI():
     layout = [
         [sg.Text('Choose Website')],
-        [sg.Combo(['Fake Jobs', 'MS3', 'WVU Office of Health Affairs', 'Career Builder', 'Indeed'])],
+        [sg.Combo(['Fake Jobs', 'MS3', 'WVU Office of Health Affairs', 'Career Builder', 'Indeed', 'USAJobs'])],
         [sg.Text('Job Title', size=(8, 1)), sg.InputText()],
         [sg.Text('Location', size=(8, 1)), sg.InputText()],
         [sg.Button("Submit"), sg.Button("Cancel"), sg.Button("Clear Results")],
@@ -37,6 +37,10 @@ def inputGUI():
             if values[0] == 'Indeed':
                 print("Indeed Results")
                 for value in indeed(values):
+                    print(value)
+            if values[0] == 'USAJobs':
+                print("USAJobs Results")
+                for value in usajobs(values):
                     print(value)
         if event == "Cancel" or event == sg.WIN_CLOSED:
             window.close()
@@ -147,6 +151,21 @@ def indeed(values):
     results = soup.find(id="jobsearch-HomePage")
     job_elements = results.find_all("div", class_="serpLinking-Column-Entry")
     # Only shows trending searches
+    for job_element in job_elements:
+        title_element = job_element.find("a")
+        if values[1] == title_element.text.strip() or values[1] == "":
+            elements.append(title_element.text.strip())
+    return elements
+
+
+def usajobs(values):
+    elements = []
+    url = "https://www.usajobs.gov/Search/Results?j=1550#"
+    page = requests.get(url)
+    soup = BeautifulSoup(page.content, "html.parser")
+    results = soup.find(id="main-content")
+    # Only shows Computer Science government positions in high demand
+    job_elements = results.find_all("li", class_="usajobs-search-no-params-highlight__list-item")
     for job_element in job_elements:
         title_element = job_element.find("a")
         if values[1] == title_element.text.strip() or values[1] == "":
