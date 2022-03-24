@@ -6,7 +6,7 @@ from bs4 import BeautifulSoup
 def inputGUI():
     layout = [
         [sg.Text('Choose Website')],
-        [sg.Combo(['Fake Jobs', 'MS3', 'WVU Office of Health Affairs', 'Career Builder', 'Indeed', 'USAJobs'])],
+        [sg.Combo(['Fake Jobs', 'MS3', 'WVU Office of Health Affairs', 'Career Builder', 'Indeed', 'USAJobs', 'IRS'])],
         [sg.Text('Job Title', size=(8, 1)), sg.InputText()],
         [sg.Text('Location', size=(8, 1)), sg.InputText()],
         [sg.Button("Submit"), sg.Button("Cancel"), sg.Button("Clear Results")],
@@ -41,6 +41,10 @@ def inputGUI():
             if values[0] == 'USAJobs':
                 print("USAJobs Results")
                 for value in usajobs(values):
+                    print(value)
+            if values[0] == 'IRS':
+                print("IRS Results")
+                for value in irs(values):
                     print(value)
         if event == "Cancel" or event == sg.WIN_CLOSED:
             window.close()
@@ -171,6 +175,29 @@ def usajobs(values):
         if values[1] == title_element.text.strip() or values[1] == "":
             elements.append(title_element.text.strip())
     return elements
+
+def irs(values):
+    elements = []
+    url = "https://www.jobs.irs.gov/careers"
+    page = requests.get(url)
+    soup = BeautifulSoup(page.content, "html.parser")
+    results = soup.find("tbody")
+    job_elements = []
+    for child in results.children:
+        if child != "\n":
+            job_elements.append(child)
+    for job_element in job_elements:
+        title_element = job_element.find("td", class_="views-field views-field-title position")
+        grade_element = job_element.find("td", class_="views-field views-field-nothing-1")
+        location_element = job_element.find("td", class_="views-field views-field-field-usajobs-locations")
+        link_element = job_element.find("a")
+        if (values[1] == title_element.text.strip() or values[1] == "") and \
+                (values[2] == location_element.text.strip() or values[2] == ""):
+            elements.append("Position: " + title_element.text.strip())
+            elements.append("Grade and Pay Range: " + grade_element.text.strip())
+            elements.append("Locations: " + location_element.text.strip())
+            elements.append("Apply here: " + link_element["href"] + "\n")
+        return elements
 
 
 sg.theme('SandyBeach')
