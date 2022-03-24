@@ -4,13 +4,11 @@ from bs4 import BeautifulSoup
 URL = "https://www.jobs.irs.gov/careers"
 page = requests.get(URL)
 soup = BeautifulSoup(page.content, "html.parser")
-results = soup.find(id="main")
-# print(results.prettify())
-
-# job_elements = results.find_all("tr", class_="odd views-row-first")
-job_elements = results.find_all("tr", class_="even")
-# job_elements = results.find_all("tr", class_="odd")
-# job_elements = results.find_all("tr, class_="odd views-row-last')
+results = soup.find("tbody")
+job_elements = []
+for child in results.children:
+    if child != "\n":
+        job_elements.append(child)
 for job_element in job_elements:
     title_element = job_element.find("td", class_="views-field views-field-title position")
     grade_element = job_element.find("td", class_="views-field views-field-nothing-1")
