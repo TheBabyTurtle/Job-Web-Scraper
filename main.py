@@ -148,17 +148,33 @@ def career_builders(values):
 
 
 def indeed(values):
+    if values[1] != '':
+        values[1] == values[1].replace(' ', '%20')
+    if values[2] != '':
+        values[2] == values[2].replace(' ', '%20')
     elements = []
-    url = "https://www.indeed.com/"
-    page = requests.get(url)
+    links = []
+    URL = "https://www.indeed.com/jobs?q=" + values[1] + "&l" + values[2]
+    page = requests.get(URL)
     soup = BeautifulSoup(page.content, "html.parser")
-    results = soup.find(id="jobsearch-HomePage")
-    job_elements = results.find_all("div", class_="serpLinking-Column-Entry")
-    # Only shows trending searches
-    for job_element in job_elements:
-        title_element = job_element.find("a")
-        if values[1] == title_element.text.strip() or values[1] == "":
-            elements.append(title_element.text.strip())
+    targets = soup.findAll('a', class_='tapItem')
+    for target in targets:
+        links.append(target['href'])
+    for link in links:
+        new_page = requests.get('https://www.indeed.com' + link)
+        new_soup = BeautifulSoup(new_page.content, 'html.parser')
+        position_name = new_soup.find('h1', class_='icl-u-xs-mb--xs icl-u-xs-mt--none jobsearch-JobInfoHeader-title')
+        company_name = new_soup.find('div', class_='jobsearch-CompanyReview--heading')
+        description = new_soup.find('div', id='jobDescriptionText')
+        if company_name is None:
+            company_name = new_soup.find('div', class_="jobsearch-InlineCompanyRating icl-u-xs-mt--xs jobsearch-DesktopStickyContainer-companyrating")
+            for child in company_name.children:
+                if child.text.strip() != '':
+                    company_name = child
+                    break
+        elements.append("\n" + "Position Name: " + position_name.text.strip())
+        elements.append("Company Name: " + company_name.text.strip())
+        elements.append(description.text.strip())
     return elements
 
 
