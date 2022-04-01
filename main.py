@@ -127,7 +127,7 @@ def health(values):
 
 
 def career_builders(values):
-    url = "https://www.careerbuilder.com/jobs?emp=" + "&keywords=" + values[1] + values[2] + "&location=" + values[3]
+    url = "https://www.careerbuilder.com/jobs?emp=" + "&keywords=" + values[1] + "&location=" + values[3]
     elements = []
     page = requests.get(url)
     soup = BeautifulSoup(page.content, "html.parser")
