@@ -7,8 +7,9 @@ def inputGUI():
     layout = [
         [sg.Text('Choose Website')],
         [sg.Combo(['Fake Jobs', 'MS3', 'WVU Office of Health Affairs', 'Career Builder', 'Indeed', 'USAJobs', 'IRS'])],
-        [sg.Text('Job Title', size=(8, 1)), sg.InputText()],
-        [sg.Text('Location', size=(8, 1)), sg.InputText()],
+        [sg.Text('Job Title', size=(15, 1)), sg.InputText()],
+        # [sg.Text('Company Name', size=(15, 1)), sg.InputText()],
+        [sg.Text('Location', size=(15, 1)), sg.InputText()],
         [sg.Button("Submit"), sg.Button("Cancel"), sg.Button("Clear Results")],
         [sg.Text('Job Results')],
         [sg.Output(key='Output', size=(100, 20))]
@@ -66,12 +67,16 @@ def tutorial(values):
         location_element = job_element.find("p", class_="location")
         link_element = job_element.find_all("a")
         if (values[1] == title_element.text.strip() or values[1] == "") and \
-                (values[2] == location_element.text.strip() or values[2] == ""):
+                (values[2] == company_element.text.strip() or values[2] == "") and \
+                (values[3] == location_element.text.strip() or values[3] == ""):
             elements.append("Job Title:" + title_element.text.strip())
             elements.append("Company Name: " + company_element.text.strip())
             elements.append("Location: " + location_element.text.strip())
             link_url = link_element[1]["href"]
             elements.append(f"Apply Here: {link_url}\n")
+    if (values[1] != title_element.text.strip()) or (values[2] != company_element.text.strip()) or \
+            (values[3] != location_element.text.strip()):
+        print("No results")
     return elements
 
 
@@ -90,10 +95,12 @@ def ms3(values):
         element_soup = BeautifulSoup(element_page.content, "html.parser")
         element_results = element_soup.find(id="site-inner")
         description = element_results.find("div", class_="career-highlight")
-        if values[1] == title_element.text.strip() or values[1] == "":
+        if values[1] == title_element.text.strip():
             elements.append("Job Title: " + title_element.text.strip())
             elements.append("Position Summary: \n" + description.text.strip())
             elements.append(f"Apply Here: {link_url}\n")
+    if values[1] != title_element.text.strip():
+        print("No results")
     return elements
 
 
@@ -114,6 +121,8 @@ def health(values):
                         break
                     elif child.name == "p":
                         elements.append(child.text.strip())
+    if values[1] != child.text.strip():
+        print("No results")
     return elements
 
 
@@ -154,8 +163,8 @@ def indeed(values):
         values[2] == values[2].replace(' ', '%20')
     elements = []
     links = []
-    URL = "https://www.indeed.com/jobs?q=" + values[1] + "&l" + values[2]
-    page = requests.get(URL)
+    url = "https://www.indeed.com/jobs?q=" + values[1] + "&l" + values[2]
+    page = requests.get(url)
     soup = BeautifulSoup(page.content, "html.parser")
     targets = soup.findAll('a', class_='tapItem')
     for target in targets:
@@ -190,7 +199,10 @@ def usajobs(values):
         title_element = job_element.find("a")
         if values[1] == title_element.text.strip() or values[1] == "":
             elements.append(title_element.text.strip())
+    if values[1] != title_element.text.strip():
+        print("No results")
     return elements
+
 
 def irs(values):
     elements = []
@@ -213,6 +225,8 @@ def irs(values):
             elements.append("Grade and Pay Range: " + grade_element.text.strip())
             elements.append("Locations: " + location_element.text.strip())
             elements.append("Apply here: " + link_element["href"] + "\n")
+    if (values[1] != title_element.text.strip()) or (values[2] != location_element.text.strip()):
+        print("No results")
     return elements
 
 
