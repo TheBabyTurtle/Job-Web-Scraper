@@ -8,7 +8,7 @@ def inputGUI():
         [sg.Text('Choose Website')],
         [sg.Combo(['Fake Jobs', 'MS3', 'WVU Office of Health Affairs', 'Career Builder', 'Indeed', 'USAJobs', 'IRS'])],
         [sg.Text('Job Title', size=(15, 1)), sg.InputText()],
-        # [sg.Text('Company Name', size=(15, 1)), sg.InputText()],
+        [sg.Text('Company Name', size=(15, 1)), sg.InputText()],
         [sg.Text('Location', size=(15, 1)), sg.InputText()],
         [sg.Button("Submit"), sg.Button("Cancel"), sg.Button("Clear Results")],
         [sg.Text('Job Results')],
@@ -127,7 +127,7 @@ def health(values):
 
 
 def career_builders(values):
-    url = "https://www.careerbuilder.com/jobs?emp=" + "&keywords=" + values[1] + "&location=" + values[2]
+    url = "https://www.careerbuilder.com/jobs?emp=" + "&keywords=" + values[1] + values[2] + "&location=" + values[3]
     elements = []
     page = requests.get(url)
     soup = BeautifulSoup(page.content, "html.parser")
@@ -153,17 +153,22 @@ def career_builders(values):
         else:
             elements.append("No salary/pay given.")
         elements.append("Apply Here: https://www.careerbuilder.com/" + job_link["href"])
+    if len(elements) == 0:
+        elements.append("No Results")
     return elements
 
 
 def indeed(values):
     if values[1] != '':
-        values[1] == values[1].replace(' ', '%20')
+        values[1] = values[1].replace(' ', '%20')
     if values[2] != '':
-        values[2] == values[2].replace(' ', '%20')
+        values[2] = values[2].replace(' ', '%20')
+    if values[3] != '':
+        values[3] = values[3].replace(' ', '%20')
     elements = []
     links = []
-    url = "https://www.indeed.com/jobs?q=" + values[1] + "&l" + values[2]
+    url = "https://www.indeed.com/jobs?q=" + values[1] + values[2] + "&l" + values[3]
+    print(url)
     page = requests.get(url)
     soup = BeautifulSoup(page.content, "html.parser")
     targets = soup.findAll('a', class_='tapItem')
@@ -184,6 +189,8 @@ def indeed(values):
         elements.append("\n" + "Position Name: " + position_name.text.strip())
         elements.append("Company Name: " + company_name.text.strip())
         elements.append(description.text.strip())
+    if len(elements) == 0:
+        elements.append("No Results")
     return elements
 
 
