@@ -66,17 +66,19 @@ def tutorial(values):
         company_element = job_element.find("h3", class_="company")
         location_element = job_element.find("p", class_="location")
         link_element = job_element.find_all("a")
-        if (values[1] == title_element.text.strip() or values[1] == "") and \
-                (values[2] == company_element.text.strip() or values[2] == "") and \
-                (values[3] == location_element.text.strip() or values[3] == ""):
-            elements.append("Job Title:" + title_element.text.strip())
-            elements.append("Company Name: " + company_element.text.strip())
-            elements.append("Location: " + location_element.text.strip())
-            link_url = link_element[1]["href"]
-            elements.append(f"Apply Here: {link_url}\n")
-    if (values[1] != title_element.text.strip()) or (values[2] != company_element.text.strip()) or \
-            (values[3] != location_element.text.strip()):
-        print("No results")
+        try:
+            if (values[1] == title_element.text.strip() or values[1] == "") and \
+                    (values[2] == company_element.text.strip() or values[2] == "") and \
+                    (values[3] == location_element.text.strip() or values[3] == ""):
+                elements.append("Job Title:" + title_element.text.strip())
+                elements.append("Company Name: " + company_element.text.strip())
+                elements.append("Location: " + location_element.text.strip())
+                link_url = link_element[1]["href"]
+                elements.append(f"Apply Here: {link_url}\n")
+        except:
+            if (values[1] != title_element.text.strip()) and (values[2] != company_element.text.strip()) and \
+                    (values[3] != location_element.text.strip()):
+                print("No results")
     return elements
 
 
@@ -95,12 +97,14 @@ def ms3(values):
         element_soup = BeautifulSoup(element_page.content, "html.parser")
         element_results = element_soup.find(id="site-inner")
         description = element_results.find("div", class_="career-highlight")
-        if values[1] == title_element.text.strip():
-            elements.append("Job Title: " + title_element.text.strip())
-            elements.append("Position Summary: \n" + description.text.strip())
-            elements.append(f"Apply Here: {link_url}\n")
-    if values[1] != title_element.text.strip():
-        print("No results")
+        try:
+            if values[1] == title_element.text.strip():
+                elements.append("Job Title: " + title_element.text.strip())
+                elements.append("Position Summary: \n" + description.text.strip())
+                elements.append(f"Apply Here: {link_url}\n")
+        except:
+            if values[1] != title_element.text.strip():
+                elements.append("No results")
     return elements
 
 
@@ -181,7 +185,8 @@ def indeed(values):
         company_name = new_soup.find('div', class_='jobsearch-CompanyReview--heading')
         description = new_soup.find('div', id='jobDescriptionText')
         if company_name is None:
-            company_name = new_soup.find('div', class_="jobsearch-InlineCompanyRating icl-u-xs-mt--xs jobsearch-DesktopStickyContainer-companyrating")
+            company_name = new_soup.find('div',
+                                         class_="jobsearch-InlineCompanyRating icl-u-xs-mt--xs jobsearch-DesktopStickyContainer-companyrating")
             for child in company_name.children:
                 if child.text.strip() != '':
                     company_name = child
@@ -190,24 +195,40 @@ def indeed(values):
         elements.append("Company Name: " + company_name.text.strip())
         elements.append(description.text.strip())
     if len(elements) == 0:
+        # if len(values[1]) == 0 or len(values[2]) == 0 or len(values[3]) == 0:
         elements.append("No Results")
     return elements
 
 
 def usajobs(values):
     elements = []
-    url = "https://www.usajobs.gov/Search/Results?j=1550#"
+    url = "https://www.usajobs.gov/Search/ExploreOpportunities?Series=1550"
     page = requests.get(url)
     soup = BeautifulSoup(page.content, "html.parser")
     results = soup.find(id="main-content")
-    # Only shows Computer Science government positions in high demand
-    job_elements = results.find_all("li", class_="usajobs-search-no-params-highlight__list-item")
+    # Only shows Computer Science government positions
+    job_elements = results.find_all("div", class_="usajobs-search-result--card")
     for job_element in job_elements:
-        title_element = job_element.find("a")
-        if values[1] == title_element.text.strip() or values[1] == "":
-            elements.append(title_element.text.strip())
-    if values[1] != title_element.text.strip():
-        print("No results")
+        title_element = job_element.find("h3", class_="usajobs-search-result__title")
+        department_element = job_element.find("h4", class_="usajobs-search-result__department")
+        agency_element = job_element.find("h5", class_="usajobs-search-result__agency")
+        location_element = job_element.find("h4", class_="usajobs-search-result__location")
+        description_element = job_element.find("p", class_="usajobs-search-result__multi-line")
+        link_element = job_element.find("a")
+        try:
+            if (values[1] == title_element.text.strip() or values[1] == "") and \
+                    (values[2] == agency_element.text.strip() or values[2] == "") and \
+                    (values[3] == location_element.text.strip() or values[3] == ""):
+                elements.append("Job title: " + title_element.text.strip())
+                elements.append("Department: " + department_element.text.strip())
+                elements.append("Agency: " + agency_element.text.strip())
+                elements.append("Location: " + location_element.text.strip())
+                elements.append("Description: " + description_element.text.strip())
+                elements.append("Apply here: " + link_element["href"] + "\n")
+        except:
+            if values[1] != title_element.text.strip() and (values[2] != agency_element.text.strip()) and \
+                    (values[3] != location_element.text.strip()):
+                print("No results")
     return elements
 
 
@@ -226,14 +247,16 @@ def irs(values):
         grade_element = job_element.find("td", class_="views-field views-field-nothing-1")
         location_element = job_element.find("td", class_="views-field views-field-field-usajobs-locations")
         link_element = job_element.find("a")
-        if (values[1] == title_element.text.strip() or values[1] == "") and \
-                (values[2] == location_element.text.strip() or values[2] == ""):
-            elements.append("Position: " + title_element.text.strip())
-            elements.append("Grade and Pay Range: " + grade_element.text.strip())
-            elements.append("Locations: " + location_element.text.strip())
-            elements.append("Apply here: " + link_element["href"] + "\n")
-    if (values[1] != title_element.text.strip()) or (values[2] != location_element.text.strip()):
-        print("No results")
+        try:
+            if (values[1] == title_element.text.strip() or values[1] == "") and \
+                    (values[2] == location_element.text.strip() or values[2] == ""):
+                elements.append("Position: " + title_element.text.strip())
+                elements.append("Grade and Pay Range: " + grade_element.text.strip())
+                elements.append("Locations: " + location_element.text.strip())
+                elements.append("Apply here: " + link_element["href"] + "\n")
+        except:
+            if (values[1] != title_element.text.strip()) or (values[2] != location_element.text.strip()):
+                print("No results")
     return elements
 
 
