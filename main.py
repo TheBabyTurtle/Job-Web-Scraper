@@ -66,19 +66,16 @@ def tutorial(values):
         company_element = job_element.find("h3", class_="company")
         location_element = job_element.find("p", class_="location")
         link_element = job_element.find_all("a")
-        try:
-            if (values[1] == title_element.text.strip() or values[1] == "") and \
-                    (values[2] == company_element.text.strip() or values[2] == "") and \
-                    (values[3] == location_element.text.strip() or values[3] == ""):
-                elements.append("Job Title:" + title_element.text.strip())
-                elements.append("Company Name: " + company_element.text.strip())
-                elements.append("Location: " + location_element.text.strip())
-                link_url = link_element[1]["href"]
-                elements.append(f"Apply Here: {link_url}\n")
-        except:
-            if (values[1] != title_element.text.strip()) and (values[2] != company_element.text.strip()) and \
-                    (values[3] != location_element.text.strip()):
-                print("No results")
+        if (values[1] == title_element.text.strip() or values[1] == "") and \
+                (values[2] == company_element.text.strip() or values[2] == "") and \
+                (values[3] == location_element.text.strip() or values[3] == ""):
+            elements.append("Job Title:" + title_element.text.strip())
+            elements.append("Company Name: " + company_element.text.strip())
+            elements.append("Location: " + location_element.text.strip())
+            link_url = link_element[1]["href"]
+            elements.append(f"Apply Here: {link_url}\n")
+    if len(elements) == 0:
+        elements.append("No results")
     return elements
 
 
@@ -97,14 +94,12 @@ def ms3(values):
         element_soup = BeautifulSoup(element_page.content, "html.parser")
         element_results = element_soup.find(id="site-inner")
         description = element_results.find("div", class_="career-highlight")
-        try:
-            if values[1] == title_element.text.strip():
-                elements.append("Job Title: " + title_element.text.strip())
-                elements.append("Position Summary: \n" + description.text.strip())
-                elements.append(f"Apply Here: {link_url}\n")
-        except:
-            if values[1] != title_element.text.strip():
-                elements.append("No results")
+        if values[1] == title_element.text.strip():
+            elements.append("Job Title: " + title_element.text.strip())
+            elements.append("Position Summary: \n" + description.text.strip())
+            elements.append(f"Apply Here: {link_url}\n")
+    if len(elements) == 0:
+        elements.append("No results")
     return elements
 
 
@@ -125,7 +120,7 @@ def health(values):
                         break
                     elif child.name == "p":
                         elements.append(child.text.strip())
-    if values[1] != child.text.strip():
+    if len(elements) == 0:
         print("No results")
     return elements
 
@@ -215,20 +210,17 @@ def usajobs(values):
         location_element = job_element.find("h4", class_="usajobs-search-result__location")
         description_element = job_element.find("p", class_="usajobs-search-result__multi-line")
         link_element = job_element.find("a")
-        try:
-            if (values[1] == title_element.text.strip() or values[1] == "") and \
-                    (values[2] == agency_element.text.strip() or values[2] == "") and \
-                    (values[3] == location_element.text.strip() or values[3] == ""):
-                elements.append("Job title: " + title_element.text.strip())
-                elements.append("Department: " + department_element.text.strip())
-                elements.append("Agency: " + agency_element.text.strip())
-                elements.append("Location: " + location_element.text.strip())
-                elements.append("Description: " + description_element.text.strip())
-                elements.append("Apply here: " + link_element["href"] + "\n")
-        except:
-            if values[1] != title_element.text.strip() and (values[2] != agency_element.text.strip()) and \
-                    (values[3] != location_element.text.strip()):
-                print("No results")
+        if (values[1] == title_element.text.strip() or values[1] == "") and \
+                (values[2] == agency_element.text.strip() or values[2] == "") and \
+                (values[3] == location_element.text.strip() or values[3] == ""):
+            elements.append("Job title: " + title_element.text.strip())
+            elements.append("Department: " + department_element.text.strip())
+            elements.append("Agency: " + agency_element.text.strip())
+            elements.append("Location: " + location_element.text.strip())
+            elements.append("Description: " + description_element.text.strip())
+            elements.append("Apply here: " + link_element["href"] + "\n")
+    if len(elements) == 0:
+        elements.append("No results")
     return elements
 
 
@@ -247,16 +239,14 @@ def irs(values):
         grade_element = job_element.find("td", class_="views-field views-field-nothing-1")
         location_element = job_element.find("td", class_="views-field views-field-field-usajobs-locations")
         link_element = job_element.find("a")
-        try:
-            if (values[1] == title_element.text.strip() or values[1] == "") and \
-                    (values[2] == location_element.text.strip() or values[2] == ""):
-                elements.append("Position: " + title_element.text.strip())
-                elements.append("Grade and Pay Range: " + grade_element.text.strip())
-                elements.append("Locations: " + location_element.text.strip())
-                elements.append("Apply here: " + link_element["href"] + "\n")
-        except:
-            if (values[1] != title_element.text.strip()) or (values[2] != location_element.text.strip()):
-                print("No results")
+        if (values[1] == title_element.text.strip() or values[1] == "") and \
+                (values[2] == location_element.text.strip() or values[2] == ""):
+            elements.append("Position: " + title_element.text.strip())
+            elements.append("Grade and Pay Range: " + grade_element.text.strip())
+            elements.append("Locations: " + location_element.text.strip())
+            elements.append("Apply here: " + link_element["href"] + "\n")
+    if len(elements) == 0:
+        elements.append("No results")
     return elements
 
 
