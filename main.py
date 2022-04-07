@@ -40,6 +40,8 @@ def inputGUI():
             if values[0] == 'Indeed':
                 print("Indeed Results")
                 results = asyncio.run(indeed_builder(values))
+                if len(results) == 0:
+                    print("No Results")
                 for result in results:
                     print(result)
             if values[0] == 'USAJobs':
@@ -197,9 +199,6 @@ async def indeed_builder(values):
         link_piece = (target['href'])
         links.append('https://www.indeed.com' + link_piece)
     elements = (indeed_scraper(session, link) for link in links)
-    if len(elements) == 0:
-        elements.append("No Results")
-
     return await asyncio.gather(*elements)
 
 
