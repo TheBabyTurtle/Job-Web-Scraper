@@ -1,5 +1,7 @@
 import PySimpleGUI as sg
 import requests
+from requests_html import AsyncHTMLSession
+import asyncio
 from bs4 import BeautifulSoup
 
 
@@ -37,8 +39,9 @@ def inputGUI():
                     print(value)
             if values[0] == 'Indeed':
                 print("Indeed Results")
-                for value in indeed(values):
-                    print(value)
+                results = asyncio.run(indeed_builder(values))
+                for result in results:
+                    print(result)
             if values[0] == 'USAJobs':
                 print("USAJobs Results")
                 for value in usajobs(values):
@@ -157,42 +160,47 @@ def career_builders(values):
     return elements
 
 
-def indeed(values):
+async def indeed_scraper(session, link):
+    job_element = []
+    new_page = await session.get(link)
+    new_soup = BeautifulSoup(new_page.content, 'html.parser')
+    position_name = new_soup.find('h1', class_='icl-u-xs-mb--xs icl-u-xs-mt--none jobsearch-JobInfoHeader-title')
+    company_name = new_soup.find('div', class_='jobsearch-CompanyReview--heading')
+    description = new_soup.find('div', id='jobDescriptionText')
+    if company_name is None:
+        company_name = new_soup.find('div',
+                                     class_="jobsearch-InlineCompanyRating icl-u-xs-mt--xs jobsearch-DesktopStickyContainer-companyrating")
+        for child in company_name.children:
+            if child.text.strip() != '':
+                company_name = child
+                break
+    job_element.append("\n" + "Position Name: " + position_name.text.strip())
+    job_element.append("Company Name: " + company_name.text.strip())
+    job_element.append(description.text.strip())
+    return job_element
+
+
+async def indeed_builder(values):
+    session = AsyncHTMLSession()
     if values[1] != '':
         values[1] = values[1].replace(' ', '%20')
     if values[2] != '':
         values[2] = values[2].replace(' ', '%20')
     if values[3] != '':
         values[3] = values[3].replace(' ', '%20')
-    elements = []
     links = []
     url = "https://www.indeed.com/jobs?q=" + values[1] + values[2] + "&l" + values[3]
-    print(url)
     page = requests.get(url)
     soup = BeautifulSoup(page.content, "html.parser")
     targets = soup.findAll('a', class_='tapItem')
     for target in targets:
-        links.append(target['href'])
-    for link in links:
-        new_page = requests.get('https://www.indeed.com' + link)
-        new_soup = BeautifulSoup(new_page.content, 'html.parser')
-        position_name = new_soup.find('h1', class_='icl-u-xs-mb--xs icl-u-xs-mt--none jobsearch-JobInfoHeader-title')
-        company_name = new_soup.find('div', class_='jobsearch-CompanyReview--heading')
-        description = new_soup.find('div', id='jobDescriptionText')
-        if company_name is None:
-            company_name = new_soup.find('div',
-                                         class_="jobsearch-InlineCompanyRating icl-u-xs-mt--xs jobsearch-DesktopStickyContainer-companyrating")
-            for child in company_name.children:
-                if child.text.strip() != '':
-                    company_name = child
-                    break
-        elements.append("\n" + "Position Name: " + position_name.text.strip())
-        elements.append("Company Name: " + company_name.text.strip())
-        elements.append(description.text.strip())
+        link_piece = (target['href'])
+        links.append('https://www.indeed.com' + link_piece)
+    elements = (indeed_scraper(session, link) for link in links)
     if len(elements) == 0:
-        # if len(values[1]) == 0 or len(values[2]) == 0 or len(values[3]) == 0:
         elements.append("No Results")
-    return elements
+
+    return await asyncio.gather(*elements)
 
 
 def usajobs(values):
