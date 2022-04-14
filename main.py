@@ -42,8 +42,6 @@ def inputGUI():
                 results = asyncio.run(indeed_builder(values))
                 if len(results) == 0:
                     print("No Results")
-                for result in results:
-                    print(result)
             if values[0] == 'USAJobs':
                 print("USAJobs Results")
                 for value in usajobs(values):
@@ -163,7 +161,6 @@ def career_builders(values):
 
 
 async def indeed_scraper(session, link):
-    job_element = []
     new_page = await session.get(link)
     new_soup = BeautifulSoup(new_page.content, 'html.parser')
     position_name = new_soup.find('h1', class_='icl-u-xs-mb--xs icl-u-xs-mt--none jobsearch-JobInfoHeader-title')
@@ -176,10 +173,9 @@ async def indeed_scraper(session, link):
             if child.text.strip() != '':
                 company_name = child
                 break
-    job_element.append("\n" + "Position Name: " + position_name.text.strip())
-    job_element.append("Company Name: " + company_name.text.strip())
-    job_element.append(description.text.strip())
-    return job_element
+    print("Position Name: " + position_name.text.strip())
+    print("Company Name: " + company_name.text.strip())
+    print(description.text.strip() + "\n")
 
 
 async def indeed_builder(values):
