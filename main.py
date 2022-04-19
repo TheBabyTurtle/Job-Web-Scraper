@@ -5,6 +5,9 @@ import asyncio
 from bs4 import BeautifulSoup
 
 
+result_counter = 0
+
+
 def inputGUI():
     layout = [
         [sg.Text('Choose Website')],
@@ -20,36 +23,50 @@ def inputGUI():
     window['Output'].TKOut.output.config(wrap='word')
     while True:
         event, values = window.read()
+        global result_counter
         if event == "Submit":
             if values[0] == 'Fake Jobs':
                 print("Beautiful Soup Tutorial Results")
-                for value in tutorial(values):
+                scraped = tutorial(values)
+                for value in scraped:
                     print(value)
+                print("The number of results found is: " + str(result_counter))
             if values[0] == 'MS3':
                 print("MS3 Results")
-                for value in ms3(values):
+                scraped = ms3(values)
+                for value in scraped:
                     print(value)
+                print("The number of results found is: " + str(result_counter))
             if values[0] == 'WVU Office of Health Affairs':
                 print("WVU Office of Health Affairs Results")
-                for value in health(values):
+                scraped = health(values)
+                for value in scraped:
                     print(value)
+                print("The number of results found is: " + str(result_counter))
             if values[0] == 'Career Builder':
                 print("Career Builder Results")
-                for value in career_builders(values):
+                scraped = career_builders(values)
+                for value in scraped:
                     print(value)
+                print("The number of results found is: " + str(result_counter))
             if values[0] == 'Indeed':
                 print("Indeed Results")
                 results = asyncio.run(indeed_builder(values))
                 if len(results) == 0:
                     print("No Results")
+                print("The number of results found is: " + str(result_counter))
             if values[0] == 'USAJobs':
                 print("USAJobs Results")
-                for value in usajobs(values):
+                scraped = usajobs(values)
+                for value in scraped:
                     print(value)
+                print("The number of results found is: " + str(result_counter))
             if values[0] == 'IRS':
                 print("IRS Results")
-                for value in irs(values):
+                scraped = irs(values)
+                for value in scraped:
                     print(value)
+                print("The number of results found is: " + str(result_counter))
         if event == "Cancel" or event == sg.WIN_CLOSED:
             window.close()
             break
@@ -58,6 +75,8 @@ def inputGUI():
 
 
 def tutorial(values):
+    global result_counter
+    result_counter = 0
     elements = []
     url = "https://realpython.github.io/fake-jobs/"
     page = requests.get(url)
@@ -77,12 +96,15 @@ def tutorial(values):
             elements.append("Location: " + location_element.text.strip())
             link_url = link_element[1]["href"]
             elements.append(f"Apply Here: {link_url}\n")
+            result_counter += 1
     if len(elements) == 0:
         elements.append("No results")
     return elements
 
 
 def ms3(values):
+    global result_counter
+    result_counter = 0
     elements = []
     url = "https://www.ms3-inc.com/careers/"
     page = requests.get(url)
@@ -101,12 +123,15 @@ def ms3(values):
             elements.append("Job Title: " + title_element.text.strip())
             elements.append("Position Summary: \n" + description.text.strip())
             elements.append(f"Apply Here: {link_url}\n")
+            result_counter += 1
     if len(elements) == 0:
         elements.append("No results")
     return elements
 
 
 def health(values):
+    global result_counter
+    result_counter = 0
     url = "http://health.wvu.edu/healthaffairs/careers/"
     page = requests.get(url)
     soup = BeautifulSoup(page.content, "html.parser")
@@ -117,6 +142,7 @@ def health(values):
         if child.name == "h4":
             if values[1] == child.text.strip() or values[1] == "":
                 elements.append("Job Title: " + child.text.strip())
+                result_counter += 1
                 while True:
                     child = child.nextSibling
                     if child.name == "h4" or child.name == "h3":
@@ -129,6 +155,8 @@ def health(values):
 
 
 def career_builders(values):
+    global result_counter
+    result_counter = 0
     url = "https://www.careerbuilder.com/jobs?emp=" + "&keywords=" + values[1] + "&location=" + values[3]
     elements = []
     page = requests.get(url)
@@ -155,6 +183,7 @@ def career_builders(values):
         else:
             elements.append("No salary/pay given.")
         elements.append("Apply Here: https://www.careerbuilder.com/" + job_link["href"])
+        result_counter += 1
     if len(elements) == 0:
         elements.append("No Results")
     return elements
@@ -179,6 +208,8 @@ async def indeed_scraper(session, link):
 
 
 async def indeed_builder(values):
+    global result_counter
+    result_counter = 0
     session = AsyncHTMLSession()
     if values[1] != '':
         values[1] = values[1].replace(' ', '%20')
@@ -194,11 +225,14 @@ async def indeed_builder(values):
     for target in targets:
         link_piece = (target['href'])
         links.append('https://www.indeed.com' + link_piece)
+        result_counter += 1
     elements = (indeed_scraper(session, link) for link in links)
     return await asyncio.gather(*elements)
 
 
 def usajobs(values):
+    global result_counter
+    result_counter = 0
     elements = []
     url = "https://www.usajobs.gov/Search/ExploreOpportunities?Series=1550"
     page = requests.get(url)
@@ -222,12 +256,15 @@ def usajobs(values):
             elements.append("Location: " + location_element.text.strip())
             elements.append("Description: " + description_element.text.strip())
             elements.append("Apply here: " + link_element["href"] + "\n")
+            result_counter += 1
     if len(elements) == 0:
         elements.append("No results")
     return elements
 
 
 def irs(values):
+    global result_counter
+    result_counter = 0
     elements = []
     url = "https://www.jobs.irs.gov/careers"
     page = requests.get(url)
@@ -248,6 +285,7 @@ def irs(values):
             elements.append("Grade and Pay Range: " + grade_element.text.strip())
             elements.append("Locations: " + location_element.text.strip())
             elements.append("Apply here: " + link_element["href"] + "\n")
+            result_counter += 1
     if len(elements) == 0:
         elements.append("No results")
     return elements
