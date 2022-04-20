@@ -11,7 +11,9 @@ result_counter = 0
 def inputGUI():
     layout = [
         [sg.Text('Choose Website')],
-        [sg.Combo(['Fake Jobs', 'MS3', 'WVU Office of Health Affairs', 'Career Builder', 'Indeed', 'USAJobs', 'IRS'])],
+        [sg.Checkbox('Fake Jobs', default=False, key='FakeJobs'), sg.Checkbox('MS3', default=False, key='MS3'), sg.Checkbox('WVU Office of Health Affairs', default=False, key='WVU')],
+        [sg.Checkbox('Career Builder', default=False, key='CB'), sg.Checkbox('Indeed', default=False, key='Indeed'), sg.Checkbox('USAJobs', default=False, key='USA')],
+        [sg.Checkbox('IRS', default=False, key='IRS')],
         [sg.Text('Job Title', size=(15, 1)), sg.InputText()],
         [sg.Text('Company Name', size=(15, 1)), sg.InputText()],
         [sg.Text('Location', size=(15, 1)), sg.InputText()],
@@ -25,43 +27,43 @@ def inputGUI():
         event, values = window.read()
         global result_counter
         if event == "Submit":
-            if values[0] == 'Fake Jobs':
+            if values['FakeJobs']:
                 print("Beautiful Soup Tutorial Results")
                 scraped = tutorial(values)
                 for value in scraped:
                     print(value)
                 print("The number of results found is: " + str(result_counter))
-            if values[0] == 'MS3':
+            if values['MS3']:
                 print("MS3 Results")
                 scraped = ms3(values)
                 for value in scraped:
                     print(value)
                 print("The number of results found is: " + str(result_counter))
-            if values[0] == 'WVU Office of Health Affairs':
+            if values['WVU']:
                 print("WVU Office of Health Affairs Results")
                 scraped = health(values)
                 for value in scraped:
                     print(value)
                 print("The number of results found is: " + str(result_counter))
-            if values[0] == 'Career Builder':
+            if values['CB']:
                 print("Career Builder Results")
                 scraped = career_builders(values)
                 for value in scraped:
                     print(value)
                 print("The number of results found is: " + str(result_counter))
-            if values[0] == 'Indeed':
+            if values['Indeed']:
                 print("Indeed Results")
                 results = asyncio.run(indeed_builder(values))
                 if len(results) == 0:
                     print("No Results")
                 print("The number of results found is: " + str(result_counter))
-            if values[0] == 'USAJobs':
+            if values['USA']:
                 print("USAJobs Results")
                 scraped = usajobs(values)
                 for value in scraped:
                     print(value)
                 print("The number of results found is: " + str(result_counter))
-            if values[0] == 'IRS':
+            if values['IRS']:
                 print("IRS Results")
                 scraped = irs(values)
                 for value in scraped:
@@ -88,9 +90,9 @@ def tutorial(values):
         company_element = job_element.find("h3", class_="company")
         location_element = job_element.find("p", class_="location")
         link_element = job_element.find_all("a")
-        if (values[1] == title_element.text.strip() or values[1] == "") and \
-                (values[2] == company_element.text.strip() or values[2] == "") and \
-                (values[3] == location_element.text.strip() or values[3] == ""):
+        if (values[0] == title_element.text.strip() or values[0] == "") and \
+                (values[1] == company_element.text.strip() or values[1] == "") and \
+                (values[2] == location_element.text.strip() or values[2] == ""):
             elements.append("Job Title:" + title_element.text.strip())
             elements.append("Company Name: " + company_element.text.strip())
             elements.append("Location: " + location_element.text.strip())
@@ -119,7 +121,7 @@ def ms3(values):
         element_soup = BeautifulSoup(element_page.content, "html.parser")
         element_results = element_soup.find(id="site-inner")
         description = element_results.find("div", class_="career-highlight")
-        if values[1] == title_element.text.strip():
+        if values[0] == title_element.text.strip() or values[0] == '':
             elements.append("Job Title: " + title_element.text.strip())
             elements.append("Position Summary: \n" + description.text.strip())
             elements.append(f"Apply Here: {link_url}\n")
@@ -140,7 +142,7 @@ def health(values):
     target = results.find(class_="page-primary rich-text")
     for child in target.children:
         if child.name == "h4":
-            if values[1] == child.text.strip() or values[1] == "":
+            if values[0] == child.text.strip() or values[0] == "":
                 elements.append("Job Title: " + child.text.strip())
                 result_counter += 1
                 while True:
@@ -157,7 +159,7 @@ def health(values):
 def career_builders(values):
     global result_counter
     result_counter = 0
-    url = "https://www.careerbuilder.com/jobs?emp=" + "&keywords=" + values[1] + "&location=" + values[3]
+    url = "https://www.careerbuilder.com/jobs?emp=" + "&keywords=" + values[0] + "&location=" + values[2]
     elements = []
     page = requests.get(url)
     soup = BeautifulSoup(page.content, "html.parser")
@@ -211,14 +213,14 @@ async def indeed_builder(values):
     global result_counter
     result_counter = 0
     session = AsyncHTMLSession()
+    if values[0] != '':
+        values[0] = values[0].replace(' ', '%20')
     if values[1] != '':
         values[1] = values[1].replace(' ', '%20')
     if values[2] != '':
         values[2] = values[2].replace(' ', '%20')
-    if values[3] != '':
-        values[3] = values[3].replace(' ', '%20')
     links = []
-    url = "https://www.indeed.com/jobs?q=" + values[1] + values[2] + "&l" + values[3]
+    url = "https://www.indeed.com/jobs?q=" + values[0] + values[1] + "&l" + values[2]
     page = requests.get(url)
     soup = BeautifulSoup(page.content, "html.parser")
     targets = soup.findAll('a', class_='tapItem')
@@ -247,9 +249,9 @@ def usajobs(values):
         location_element = job_element.find("h4", class_="usajobs-search-result__location")
         description_element = job_element.find("p", class_="usajobs-search-result__multi-line")
         link_element = job_element.find("a")
-        if (values[1] == title_element.text.strip() or values[1] == "") and \
-                (values[2] == agency_element.text.strip() or values[2] == "") and \
-                (values[3] == location_element.text.strip() or values[3] == ""):
+        if (values[0] == title_element.text.strip() or values[0] == "") and \
+                (values[1] == agency_element.text.strip() or values[1] == "") and \
+                (values[2] == location_element.text.strip() or values[2] == ""):
             elements.append("Job title: " + title_element.text.strip())
             elements.append("Department: " + department_element.text.strip())
             elements.append("Agency: " + agency_element.text.strip())
@@ -279,8 +281,8 @@ def irs(values):
         grade_element = job_element.find("td", class_="views-field views-field-nothing-1")
         location_element = job_element.find("td", class_="views-field views-field-field-usajobs-locations")
         link_element = job_element.find("a")
-        if (values[1] == title_element.text.strip() or values[1] == "") and \
-                (values[2] == location_element.text.strip() or values[2] == ""):
+        if (values[0] == title_element.text.strip() or values[0] == "") and \
+                (values[1] == location_element.text.strip() or values[1] == ""):
             elements.append("Position: " + title_element.text.strip())
             elements.append("Grade and Pay Range: " + grade_element.text.strip())
             elements.append("Locations: " + location_element.text.strip())
