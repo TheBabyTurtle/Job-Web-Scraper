@@ -11,15 +11,16 @@ result_counter = 0
 def inputGUI():
     layout = [
         [sg.Text('Choose Website')],
-        [sg.Checkbox('Fake Jobs', default=False, key='FakeJobs'), sg.Checkbox('MS3', default=False, key='MS3'), sg.Checkbox('WVU Office of Health Affairs', default=False, key='WVU')],
-        [sg.Checkbox('Career Builder', default=False, key='CB'), sg.Checkbox('Indeed', default=False, key='Indeed'), sg.Checkbox('USAJobs', default=False, key='USA')],
-        [sg.Checkbox('IRS', default=False, key='IRS')],
+        [sg.Checkbox('Fake Jobs', default=False, key='FakeJobs'), sg.Checkbox('MS3', default=False, key='MS3'),
+         sg.Checkbox('WVU Office of Health Affairs', default=False, key='WVU')],
+        [sg.Checkbox('Career Builder', default=False, key='CB'), sg.Checkbox('USAJobs', default=False, key='USA'),
+         sg.Checkbox('IRS', default=False, key='IRS'), sg.Checkbox('Indeed', default=False, key='Indeed')],
         [sg.Text('Job Title', size=(15, 1)), sg.InputText()],
         [sg.Text('Company Name', size=(15, 1)), sg.InputText()],
         [sg.Text('Location', size=(15, 1)), sg.InputText()],
         [sg.Button("Submit"), sg.Button("Cancel"), sg.Button("Clear Results")],
         [sg.Text('Job Results')],
-        [sg.Output(key='Output', size=(100, 20))]
+        [sg.Output(key='Output', size=(150, 20))]
     ]
     window = sg.Window('Web Scraper', layout).finalize()
     window['Output'].TKOut.output.config(wrap='word')
@@ -32,42 +33,42 @@ def inputGUI():
                 scraped = tutorial(values)
                 for value in scraped:
                     print(value)
-                print("The number of results found is: " + str(result_counter))
+                print("The number of results found is: " + str(result_counter) + "\n")
             if values['MS3']:
                 print("MS3 Results")
                 scraped = ms3(values)
                 for value in scraped:
                     print(value)
-                print("The number of results found is: " + str(result_counter))
+                print("The number of results found is: " + str(result_counter) + "\n")
             if values['WVU']:
                 print("WVU Office of Health Affairs Results")
                 scraped = health(values)
                 for value in scraped:
                     print(value)
-                print("The number of results found is: " + str(result_counter))
+                print("The number of results found is: " + str(result_counter) + "\n")
             if values['CB']:
                 print("Career Builder Results")
                 scraped = career_builders(values)
                 for value in scraped:
                     print(value)
-                print("The number of results found is: " + str(result_counter))
-            if values['Indeed']:
-                print("Indeed Results")
-                results = asyncio.run(indeed_builder(values))
-                if len(results) == 0:
-                    print("No Results")
-                print("The number of results found is: " + str(result_counter))
+                print("The number of results found is: " + str(result_counter) + "\n")
             if values['USA']:
                 print("USAJobs Results")
                 scraped = usajobs(values)
                 for value in scraped:
                     print(value)
-                print("The number of results found is: " + str(result_counter))
+                print("The number of results found is: " + str(result_counter) + "\n")
             if values['IRS']:
                 print("IRS Results")
                 scraped = irs(values)
                 for value in scraped:
                     print(value)
+                print("The number of results found is: " + str(result_counter) + "\n")
+            if values['Indeed']:
+                print("Indeed Results")
+                results = asyncio.run(indeed_builder(values))
+                if len(results) == 0:
+                    print("No Results")
                 print("The number of results found is: " + str(result_counter))
         if event == "Cancel" or event == sg.WIN_CLOSED:
             window.close()
