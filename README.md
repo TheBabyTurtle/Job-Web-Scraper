@@ -11,7 +11,7 @@ The user can choose which website to gather information through the checkboxes o
 The other classes were created to test each website individaully before adding them to the main class.
 # Usage
 Running the python file will open the gui as shown below.
-![alt text](https://github.com/TheBabyTurtle/Job-Web-Scraper/blob/main/GUI.PNG)
+![image](https://user-images.githubusercontent.com/62351065/165407560-d9324168-8aa8-4173-b45d-4aaf37f1bf79.png)
 Each checkbox allows the user to choose which scrapers they would like to use.
 The input text bars allow the user to fill in any limitations they would want in the results.
 The submit button submits runs the selected scrapers and passes any inputs to them.
