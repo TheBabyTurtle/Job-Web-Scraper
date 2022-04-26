@@ -10,5 +10,13 @@ This project makes use of four libraries: requests, Beautiful Soup, PySimpleGUI,
 The user can choose which website to gather information through the checkboxes on the GUI and then add parameters such as Job Title with the text boxes.
 The other classes were created to test each website individaully before adding them to the main class.
 # Usage
-Running the python 
+Running the python file will open the gui as shown below.
 ![alt text](https://github.com/TheBabyTurtle/Job-Web-Scraper/blob/main/GUI.PNG)
+Each checkbox allows the user to choose which scrapers they would like to use.
+The input text bars allow the user to fill in any limitations they would want in the results.
+The submit button submits runs the selected scrapers and passes any inputs to them.
+The cancel button closes the program.
+The clear all button clears all output from the output textbox.
+After submission the output text box will show any listings that matched the inputs and how many
+were returned from each scraped website (see image below).
+![image](https://user-images.githubusercontent.com/62351065/165407522-dcc64571-29c0-42bf-865f-b5e8842ce08d.png)
