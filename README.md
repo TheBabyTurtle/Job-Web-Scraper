@@ -11,3 +11,4 @@ The user can choose which website to gather information through the checkboxes o
 The other classes were created to test each website individaully before adding them to the main class.
 # Usage
 Running the python 
+![alt text](https://github.com/TheBabyTurtle/Job-Web-Scraper/blob/main/GUI.PNG)
