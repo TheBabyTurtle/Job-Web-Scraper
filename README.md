@@ -8,7 +8,6 @@ This program can scrape job listing information such as job title, location, job
 It can then return this information to the user through the Graphical User Interface.
 This project makes use of four libraries: requests, Beautiful Soup, PySimpleGUI, and Asyncio.
 The user can choose which website to gather information through the checkboxes on the GUI and then add parameters such as Job Title with the text boxes.
-The other classes were created to test each website individaully before adding them to the main class.
 # Usage
 Running the python file will open the gui as shown below.
 ![image](https://user-images.githubusercontent.com/62351065/165407560-d9324168-8aa8-4173-b45d-4aaf37f1bf79.png)
